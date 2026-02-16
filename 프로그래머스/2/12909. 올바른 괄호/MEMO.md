@@ -66,19 +66,27 @@
 
 ```python
 def solution(s):
+    s = list(s)
     stack = []
     
-    for char in s:
-        if char == '(':
-            stack.append(char)  # 열린 괄호는 스택에 쌓기
+    condition = True
+    
+    for i in range(len(s)):
+        if s[i]=="(":
+            stack.append("(")
         else:
-            # 닫힌 괄호인데 꺼낼 열린 괄호가 없는 경우
-            if len(stack) == 0:
-                return False
-            stack.pop()  # 짝이 맞으면 꺼내기
-            
-    # 모든 순회 후 스택이 비어있어야 올바른 괄호
-    return len(stack) == 0
+            if len(stack)<=0:
+                condition = False
+            else:
+                if len(stack)>=1:
+                    del stack[-1]
+                else:
+                    condition = False
+    
+    if len(stack)>=1:
+        condition = False         
+    
+    return condition
 
 ```
 
