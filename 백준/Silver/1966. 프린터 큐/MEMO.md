@@ -26,47 +26,6 @@
 **해결 방법**: 문서의 중요도와 별개로 **문서의 초기 위치를 기준으로 라벨링(Indexing)**을 하여, `popleft`와 `append` 시 두 정보가 항상 함께 움직이도록 구현했습니다.
 
 
-## ✅ 최종 코드 (Python)
-
-```python
-import sys
-from collections import deque 
-
-# 테스트 케이스 입력
-testcase = int(sys.stdin.readline())
-
-for _ in range(testcase):
-    # N: 문서의 개수, where: 목표 문서의 현재 위치
-    N, where = map(int, sys.stdin.readline().split())
-    # [cite_start]중요도 정보를 담은 큐 [cite: 21, 24]
-    importance = deque(map(int, sys.stdin.readline().split()))
-    # [cite_start]각 문서의 초기 인덱스를 라벨링한 큐 [cite: 33]
-    document = deque(i for i in range(N))
-
-    cnt = 0
-    # 목표로 하는 문서의 초기 인덱스 값
-    goal = document[where]  
-    output = []
-
-    while True: 
-        # [cite_start]현재 문서가 최대 중요도인지 확인 [cite: 7]
-        if importance[0] == max(importance):
-            # [cite_start]인쇄 실행: 큐에서 제거하고 결과 리스트에 추가 [cite: 8, 12]
-            printed_doc = document.popleft()
-            importance.popleft()
-            output.append(printed_doc)
-            
-            # [cite_start]방금 인쇄된 문서가 내가 찾던 목표 문서인지 확인 [cite: 13]
-            if output[-1] == goal:
-                print(len(output)) # 인쇄된 순서(리스트 길이) 출력
-                break
-        else:
-            # [cite_start]중요도가 낮으면 뒤로 보냄 (순서 동기화) [cite: 10]
-            importance.append(importance.popleft())
-            document.append(document.popleft())
-
-```
-
 ## 📈 성능 분석
 
 ### 시간 복잡도: 
