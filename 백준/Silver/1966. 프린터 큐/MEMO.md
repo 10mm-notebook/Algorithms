@@ -1,0 +1,85 @@
+# [BAEKJOON] 1966. 프린터 큐
+
+## 📌 문제 개요
+
+**출처**: 백준 1966번 (프린터 큐) 
+
+**핵심 개념**: 양방향 큐(deque), 시뮬레이션 
+
+**난이도**: Silver III
+
+## 📝 설계 및 풀이 로직
+
+### 1. 기본 메커니즘
+
+* 현재 대기열의 가장 앞에 있는 문서의 중요도를 확인합니다.
+
+* 나머지 문서들 중 현재 문서보다 중요도가 높은 것이 하나라도 있다면, 현재 문서를 가장 뒤로 보냅니다 (Rotate).
+
+* 그렇지 않다면 해당 문서를 인쇄(Pop)하고 인쇄 순서(`cnt`)를 기록합니다.
+
+
+
+### 2. 시행착오 및 디버깅 (Trial & Error)
+**중요도 기반 타겟팅의 한계**: 단순히 `goal = importance[where]`로 설정할 경우, 중요도가 같은 문서가 여러 개 존재할 때 내가 찾는 특정 문서를 정확히 식별할 수 없습니다.
+
+**해결 방법**: 문서의 중요도와 별개로 **문서의 초기 위치를 기준으로 라벨링(Indexing)**을 하여, `popleft`와 `append` 시 두 정보가 항상 함께 움직이도록 구현했습니다.
+
+
+## ✅ 최종 코드 (Python)
+
+```python
+import sys
+from collections import deque 
+
+# 테스트 케이스 입력
+testcase = int(sys.stdin.readline())
+
+for _ in range(testcase):
+    # N: 문서의 개수, where: 목표 문서의 현재 위치
+    N, where = map(int, sys.stdin.readline().split())
+    # [cite_start]중요도 정보를 담은 큐 [cite: 21, 24]
+    importance = deque(map(int, sys.stdin.readline().split()))
+    # [cite_start]각 문서의 초기 인덱스를 라벨링한 큐 [cite: 33]
+    document = deque(i for i in range(N))
+
+    cnt = 0
+    # 목표로 하는 문서의 초기 인덱스 값
+    goal = where 
+    output = []
+
+    while True: 
+        # [cite_start]현재 문서가 최대 중요도인지 확인 [cite: 7]
+        if importance[0] == max(importance):
+            # [cite_start]인쇄 실행: 큐에서 제거하고 결과 리스트에 추가 [cite: 8, 12]
+            printed_doc = document.popleft()
+            importance.popleft()
+            output.append(printed_doc)
+            
+            # [cite_start]방금 인쇄된 문서가 내가 찾던 목표 문서인지 확인 [cite: 13]
+            if output[-1] == goal:
+                print(len(output)) # 인쇄된 순서(리스트 길이) 출력
+                break
+        else:
+            # [cite_start]중요도가 낮으면 뒤로 보냄 (순서 동기화) [cite: 10]
+            importance.append(importance.popleft())
+            document.append(document.popleft())
+
+```
+
+## 📈 성능 분석
+
+### 시간 복잡도: 
+
+* 각 테스트 케이스마다 문서 개가 인쇄될 때까지 루프가 돕니다.
+* 루프 내부에서 `max(importance)`를 호출하여 큐 전체를 탐색하므로 $O(N)$이 추가로 소요됩니다.
+* 그러므로 제한 시간 내에 충분히 통과 가능합니다.
+
+### 공간 복잡도: 
+
+* 문서의 중요도와 인덱스를 저장하기 위한 큐(`deque`) 두 개를 사용합니다.
+
+## 💡 회고
+
+**데이터 동기화**: 두 개의 큐(`importance`, `document`)가 항상 동일한 시점에 `pop`과 `append`가 일어나야 데이터 무결성이 유지된다는 점을 배웠습니다.
+**예외 처리**: 큐가 비어있는 상태에서 인덱스에 접근할 때 발생하는 `IndexError`를 통해 루프의 종료 조건과 큐의 상태 관리의 중요성을 다시 확인했습니다.
