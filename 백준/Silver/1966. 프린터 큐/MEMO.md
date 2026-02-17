@@ -45,7 +45,7 @@ for _ in range(testcase):
 
     cnt = 0
     # 목표로 하는 문서의 초기 인덱스 값
-    goal = where 
+    goal = document[where]  
     output = []
 
     while True: 
